@@ -14,11 +14,11 @@ pub fn impl_orfile(input: TokenStream) -> TokenStream {
 
 	let lower_case_struct_prefix = struct_name.to_string().to_lowercase();
 	let doc_where = Literal::string(&format!(
-		"Run {} with all parameters passed explicitly as CLI flags.",
+		"Run {} with all parameters passed explicitly as CLI flags. See Orfile documentation for more details: <https://github.com/movementlabsxyz/orfile>",
 		lower_case_struct_prefix
 	));
 	let doc_using = Literal::string(&format!(
-		"Run {} with parameters from environment variables, config files, and CLI flags.",
+		"Run {} with parameters from environment variables, config files, and CLI flags. See Orfile documentation for more details: <https://github.com/movementlabsxyz/orfile>",
 		lower_case_struct_prefix
 	));
 
