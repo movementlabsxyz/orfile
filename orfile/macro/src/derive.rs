@@ -51,7 +51,6 @@ pub fn impl_orfile(input: TokenStream) -> TokenStream {
 			});
 			quote! {
 				#(#attrs)*
-				#[clap(long)]
 				pub #id: #ty,
 			}
 		})
@@ -105,7 +104,19 @@ pub fn impl_orfile(input: TokenStream) -> TokenStream {
 							.replace("-", "_")
 							.to_ascii_lowercase(); // optional for safety
 						let val = pair[1].to_string();
-						config_map.insert(key, serde_json::Value::String(val));
+
+						// Try to parse as different types in order of precedence
+						let value = if let Ok(obj) = serde_json::from_str::<serde_json::Value>(&val) {
+							obj
+						} else if let Ok(b) = val.parse::<bool>() {
+							serde_json::Value::Bool(b)
+						} else if let Ok(n) = val.parse::<f64>() {
+							serde_json::Value::Number(serde_json::Number::from_f64(n).unwrap())
+						} else {
+							serde_json::Value::String(val)
+						};
+
+						config_map.insert(key, value);
 					}
 				}
 
@@ -116,19 +127,12 @@ pub fn impl_orfile(input: TokenStream) -> TokenStream {
 		.collect();
 
 	let construct_config_fields: Vec<_> = config_idents.iter().map(|id| quote! { #id }).collect();
-	let construct_other_fields: Vec<_> = other_fields
-		.iter()
-		.map(|f| {
-			let id = &f.ident;
-			quote! { #id: self.#id.clone() }
-		})
-		.collect();
 
 	let expanded = quote! {
 		pub mod #mod_using {
 			use super::*;
-			use anyhow::{Context, Error};
-			use serde_json;
+			use orfile::anyhow::{Context, Error};
+			use orfile::serde_json;
 
 			#[derive(clap::Parser, Debug, Clone)]
 			#[clap(trailing_var_arg = true)]
@@ -146,7 +150,6 @@ pub fn impl_orfile(input: TokenStream) -> TokenStream {
 
 					Ok(super::#struct_name {
 						#(#construct_config_fields,)*
-						#(#construct_other_fields,)*
 					})
 				}
 			}

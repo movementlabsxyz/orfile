@@ -1,18 +1,37 @@
 <div align="center">
   <pre>
-          ------------
-f ------ |            |
-f ------ | 5e771e3e47 |
-5 ------ |            |
-          ------------
+|| |
   </pre>
 </div>
 
-# ffs
+# orfile
 
-> FFS, just take a vote.
+> Or get it from a file!
 
-Movement Labs' Fast Finality Settlement is a proof of stake settlement system.
+Orfile is a standard for loading CLI parameters from different sources. 
+
+## `where` and `using`
+Orfile allows the developer to program `where` and `using` subcommand variants are tied into the same logic, but accept different parameters.
+
+> [!NOTE]
+> A helpful pattern is to check command requirements with `where` and then develop with `using`.
+
+- **`where`**: Explicitly requires parameters to be passed in as args. This is best for when you're learning to use a given command, or want to see what is necessary to run a command.
+- **`using`**: Allows parameters to be passed in a hierarchy from environment variables, to config files, to command line args **in order of override.** This is useful for production settings. The subcommand will still validate the config.
+
+**Example**
+The below is and example command supported from this directory by building the `tool` binary. 
+
+```bash
+tool add where --left 1 --right 2 
+ADD_LEFT=1 tool add using --config ./examples/config.json -- --right 4
+```
+
+where
+
+- `ADD_LEFT`: is an environment variable that supplies the parameter to the `--left` keyword argument.
+-- `./config.json`: is a JSON formatted config that may contain any of the parameters.
+-- `-- --right`: is a final override with a command line argument. 
 
 ## Contributing and getting started
 
@@ -22,30 +41,10 @@ Movement Labs' Fast Finality Settlement is a proof of stake settlement system.
 | [Release Candidates](https://github.com/movementlabsxyz/ffs/issues?q=is%3Aissue%20state%3Aopen%20label%3Arelease-candidate) | Feature-complete versions linked to events. |
 | [Features & Bugs](https://github.com/movementlabsxyz/ffs/issues?q=is%3Aissue%20state%3Aopen%20label%3Afeature%2Cbug%20label%3Apriority%3Aurgent%2Cpriority%3Ahigh) | High-priority `feature` and `bug` issues. |
 
-Please see the [CONTRIBUTING.md](CONTRIBUTING.md) file for contribution guidelines.
+Please see the [CONTRIBUTING.md](CONTRIBUTING.md) file for additional contribution guidelines.
 
 ## Organization
 
 There are five subdirectories which progressively build on one another for node logic.
 
-1. [`util`](./util): contains utility logic mainly reused in [`protocol`](./protocol).
-2. [`protocol`](./protocol): contains implementations of the protocol logic.
-3. [`node`](./node): contains single-process runnable binaries that aggregate the protocol logic.
-4. [`network`](./network): contains logic for running multiple nodes in a network.
-5. [`sdk`](./sdk): contains logic for interacting nodes and networks.
-
-There are several other subdirectories of note:
-
-- [`spec`](./spec): contains formal verification of FFS protocols.
-
-### Crates
-
-To better understand the available crates we recommend reviewing the `cargo doc` documentation:
-
-```bash
-cargo doc --open --no-deps
-```
-
-### Production
-
-Coming soon!
+1. [`orfile`](./orfile/): contains all core `orfile` logic.

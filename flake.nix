@@ -102,17 +102,11 @@
                 export CPPFLAGS="-I/opt/homebrew/opt/zlib/include"
               fi
 
-              echo "Monza Aptos path: $MONZA_APTOS_PATH"
               cat <<'EOF'
-                _______________________________
-                \_   _____/\_   _____/   _____/
-                |    __)   |    __) \_____  \ 
-                |     \    |     \  /        \
-                \___  /    \___  / /_______  /
-                    \/         \/          \/ 
+              || |
               EOF
 
-              echo "Develop with Move Anywhere"
+              echo "Or get it from a file!"
             '';
           };
         };
