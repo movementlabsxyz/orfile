@@ -24,14 +24,11 @@ The below is and example command supported from this directory by building the `
 
 ```bash
 tool add where --left 1 --right 2 
-ADD_LEFT=1 tool add using --config ./examples/config.json -- --right 4
+ADD_LEFT=1 tool add using --args-path ./examples/config.json -- --right 4
 ```
 
-where
+To see how to implement such a CLI tool using the `orfile::Orfile` macro, see [`tool::cli::add`](./examples/tool/src/cli/add/mod.rs).
 
-- `ADD_LEFT`: is an environment variable that supplies the parameter to the `--left` keyword argument.
--- `./config.json`: is a JSON formatted config that may contain any of the parameters.
--- `-- --right`: is a final override with a command line argument. 
 
 ## Contributing and getting started
 

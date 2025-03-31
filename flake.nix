@@ -102,6 +102,12 @@
                 export CPPFLAGS="-I/opt/homebrew/opt/zlib/include"
               fi
 
+              # Add $(pwd)/target/debug to PATH
+              export PATH=$(pwd)/target/debug:$PATH
+
+              # Add $(pwd)/target/release to PATH
+              export PATH=$(pwd)/target/release:$PATH
+
               cat <<'EOF'
               || |
               EOF
