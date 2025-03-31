@@ -14,11 +14,11 @@ pub fn impl_orfile(input: TokenStream) -> TokenStream {
 
 	let lower_case_struct_prefix = struct_name.to_string().to_lowercase();
 	let doc_where = Literal::string(&format!(
-		"Run {} with all parameters passed explicitly as CLI flags. See the Orfile documentation for more details: <https://github.com/movementlabsxyz/orfile>",
+		"Run {} with all parameters passed explicitly as CLI flags.",
 		lower_case_struct_prefix
 	));
 	let doc_using = Literal::string(&format!(
-		"Run {} with parameters from environment variables, config files, and CLI flags. See the Orfile documentation for more details: <https://github.com/movementlabsxyz/orfile>",
+		"Run {} with parameters from environment variables, config files, and CLI flags.",
 		lower_case_struct_prefix
 	));
 
@@ -127,6 +127,13 @@ pub fn impl_orfile(input: TokenStream) -> TokenStream {
 		.collect();
 
 	let construct_config_fields: Vec<_> = config_idents.iter().map(|id| quote! { #id }).collect();
+	let construct_other_fields: Vec<_> = other_fields
+		.iter()
+		.map(|f| {
+			let id = &f.ident;
+			quote! { #id: self.#id.clone() }
+		})
+		.collect();
 
 	let expanded = quote! {
 		pub mod #mod_using {
@@ -150,6 +157,7 @@ pub fn impl_orfile(input: TokenStream) -> TokenStream {
 
 					Ok(super::#struct_name {
 						#(#construct_config_fields,)*
+						#(#construct_other_fields,)*
 					})
 				}
 			}
