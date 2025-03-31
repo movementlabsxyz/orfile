@@ -148,6 +148,7 @@ pub fn impl_orfile(input: TokenStream) -> TokenStream {
 
 				#(#other_field_defs)*
 
+				/// Extra arguments to be passed to the CLI
 				pub extra_args: Vec<String>,
 			}
 
