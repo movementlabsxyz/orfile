@@ -59,7 +59,13 @@ pub fn impl_orfile(input: TokenStream) -> TokenStream {
 	let config_path_fields: Vec<_> = config_path_idents
 		.iter()
 		.map(|id| {
+			let doc_path = Literal::string(&format!(
+				"Path to the config file for {}",
+				lower_case_struct_prefix
+			));
+
 			quote! {
+				#[doc = #doc_path]
 				#[clap(long)]
 				pub #id: Option<String>,
 			}
