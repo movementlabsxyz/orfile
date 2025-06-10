@@ -260,6 +260,7 @@ fn generate_module(
 ) -> TokenStream2 {
 	let selection_types = selections.iter().map(|opt| &*opt.subcommand_type).collect::<Vec<_>>();
 	let flag_names = selections.iter().map(|opt| &opt.flag_name).collect::<Vec<_>>();
+	let selections_len = selections.len();
 
 	// Generate the prefix handling code for each selection
 	let prefix_handlers: Vec<_> = selections
@@ -292,12 +293,14 @@ fn generate_module(
 	// Generate the help display code for each selection
 	let help_handlers: Vec<_> = selections
 		.iter()
-		.map(|opt| {
+		.enumerate()
+		.map(|(index, opt)| {
 			let ty = &opt.subcommand_type;
 			let flag = &opt.flag_name;
 			quote! {
 				{
-					println!("=== Help for {} ===", <#ty as CommandFactory>::command().get_name());
+					// bold and underscore selection number and flag name
+					println!("\x1b[1;4mSelection ({}/{}):\x1b[0m {}", #index + 1, #selections_len, stringify!(#flag));
 					let mut cmd = <#ty as CommandFactory>::command();
 					cmd = cmd.name(concat!(stringify!(#flag), "{}"));
 					cmd.print_help().unwrap();
