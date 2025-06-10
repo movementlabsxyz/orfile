@@ -19,6 +19,9 @@ Orfile allows the developer to program `where` and `using` subcommand variants a
 - **`where`**: Explicitly requires parameters to be passed in as args. This is best for when you're learning to use a given command, or want to see what is necessary to run a command.
 - **`using`**: Allows parameters to be passed in a hierarchy from environment variables, to config files, to command line args **in order of override.** This is useful for production settings. The subcommand will still validate the config.
 
+> [!TIP]
+>  To see how to implement such a CLI tool using the `orfile::Orfile` macro, see [`tool::cli::add`](./examples/tool/src/cli/add/mod.rs).
+
 **Example**
 The below is and example command supported from this directory by building the `tool` binary. 
 
@@ -27,12 +30,23 @@ tool add where --left 1 --right 2
 ADD_LEFT=1 tool add using --args-path ./examples/config.json -- --right 4
 ```
 
-To see how to implement such a CLI tool using the `orfile::Orfile` macro, see [`tool::cli::add`](./examples/tool/src/cli/add/mod.rs).
-
 ## `slect`
 The orfile repo also houses the `slect` API which used for chosing one of many subcommand as Selections. 
 
+> [!WARNING]
+> The task of prefixing flattend args in [`clap`] has long been unresolved, owing to abstractions on the parser and their availability in different contexts.
+> 
+> `slect` works around these limitations at the expense of direct `--help` support--essentially extending the parsing into `extra_args` with prefix handling.  
+>
+> **See, for more information about complications associated with `clap` prefixing:**
+> - https://github.com/clap-rs/clap/issues/3117
+> - https://github.com/clap-rs/clap/issues/5374
+
+> [!TIP]
+> To see how to implement such a CLI tool using the `slect::Slect` macro, see [`select_tool::cli`](./examples/select-tool/src/cli/mod.rs).
+
 **Example**
+
 Select everything: 
 ```
 select-tool --add --multiply --divide -- --add.left 2 --add.right 2 --multiply.left 2 --multiply.right 3 --divide.left 3 --divide.right 2
@@ -103,8 +117,6 @@ Options:
       --right <RIGHT>  The right number
   -h, --help           Print help (see more with '--help')
 ```
-
-To see how to implement such a CLI tool using the `slect::Slect` macro, see [`select_tool::clie`](./examples/select-tool/src/cli/mod.rs).
 
 ## Contributing and getting started
 
