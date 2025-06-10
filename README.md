@@ -34,7 +34,7 @@ ADD_LEFT=1 tool add using --args-path ./examples/config.json -- --right 4
 The `orfile` repo also houses the `slect` API which used for chosing one of many subcommand as Selections. 
 
 > [!WARNING]
-> The task of prefixing flattend args in [`clap`] has long been unresolved, owing to abstractions on the parser and their availability in different contexts.
+> The task of prefixing flattend args in [`clap`](https://github.com/clap-rs/clap) has long been unresolved, owing to abstractions on the parser and their availability in different contexts.
 > 
 > `slect` works around these limitations at the expense of direct `--help` support--essentially extending the parsing into `extra_args` with prefix handling.  
 >
