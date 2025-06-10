@@ -1,12 +1,12 @@
 use clap::Parser;
 use serde::{Deserialize, Serialize};
 
-/// The arguments for the add command
+/// The arguments for the multiply command
 ///
 /// We define this as a separate struct because Orfile requires separate config structs to allow composability and discretion between mandatory and `using` enabled fields.
 #[derive(Parser, Debug, Clone, Serialize, Deserialize)]
 #[clap(rename_all = "kebab-case")]
-pub struct Add {
+pub struct Multiply {
 	/// The left number
 	#[clap(long)]
 	pub left: u64,
@@ -15,10 +15,10 @@ pub struct Add {
 	pub right: u64,
 }
 
-impl Add {
+impl Multiply {
 	pub async fn execute(&self) -> Result<(), anyhow::Error> {
 		println!("{:?}", self);
-		println!("{}", self.left + self.right);
+		println!("{}", self.left * self.right);
 
 		Ok(())
 	}

@@ -1,6 +1,6 @@
 use clap::*;
 use dotenv::dotenv;
-use tool::cli;
+use select_tool::cli::select;
 
 #[tokio::main]
 async fn main() -> Result<(), anyhow::Error> {
@@ -8,7 +8,7 @@ async fn main() -> Result<(), anyhow::Error> {
 	dotenv().ok();
 
 	// Run the CLI.
-	let tool = cli::Tool::parse();
+	let tool = select::Tool::parse();
 	tool.execute().await?;
 	Ok(())
 }

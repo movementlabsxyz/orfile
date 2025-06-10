@@ -10,8 +10,8 @@ publish.workspace = true
 rust-version.workspace = true
 
 [dependencies]
-orfile-macro = { workspace = true}
-orfile-util = { workspace = true}
+slect-macro = { workspace = true}
+slect-util = { workspace = true}
 anyhow = { workspace = true }
 serde_json = { workspace = true }
 

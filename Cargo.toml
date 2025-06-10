@@ -6,7 +6,7 @@ members = [
 
   "orfile/*",
   "slect/*", 
-  "examples/tool",
+  "examples/*",
 
 ]
 
