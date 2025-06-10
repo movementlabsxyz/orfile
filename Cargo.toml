@@ -5,6 +5,7 @@ resolver = "2"
 members = [
 
   "orfile/*",
+  "slect/*", 
   "examples/tool",
 
 ]
@@ -14,8 +15,8 @@ version = "0.0.1"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 authors = ["Movement Labs"]
-repository = "www.github.com/movementlabsxyz/ffs"
-homepage = "www.github.com/movementlabsxyz/ffs"
+repository = "www.github.com/movementlabsxyz/orfile"
+homepage = "www.github.com/movementlabsxyz/orfile"
 publish = false
 rust-version = "1.81.0"
 
@@ -53,9 +54,14 @@ strip-ansi-escapes = "0.2.1"
 cargo_metadata = "0.19.2"
 
 # internal
+## orfile
 orfile = { path = "orfile/orfile" }
 orfile-util = { path = "orfile/util" }
 orfile-macro = { path = "orfile/macro" }
+## slect
+slect = { path = "slect/slect" }
+slect-util = { path = "slect/util" }
+slect-macro = { path = "slect/macro" }
 
 
 [workspace.lints.clippy]

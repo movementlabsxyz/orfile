@@ -3,18 +3,17 @@
     nixpkgs.url = "github:NixOS/nixpkgs/a7abebc31a8f60011277437e000eebcc01702b9f";
     rust-overlay.url = "github:oxalica/rust-overlay/75b2271c5c087d830684cd5462d4410219acc367";
     flake-utils.url = "github:numtide/flake-utils";
-    foundry.url = "github:shazow/foundry.nix/72db7ea069f055d5c7856aca091179a070201931"; 
     crane.url = "github:ipetkov/crane";
     crane.inputs.nixpkgs.follows = "nixpkgs";
     
   };
 
-  outputs = { nixpkgs, rust-overlay, flake-utils, foundry, crane, ... }:
+  outputs = { nixpkgs, rust-overlay, flake-utils, crane, ... }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs {
           inherit system;
-          overlays = [ (import rust-overlay) foundry.overlay ];
+          overlays = [ (import rust-overlay) ];
         };
 
         toolchain = p: (p.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml).override {
@@ -63,7 +62,6 @@
         testDependencies = with pkgs; [
           python311
           just
-          foundry-bin
           process-compose
           jq
           docker

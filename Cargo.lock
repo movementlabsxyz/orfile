@@ -415,6 +415,36 @@ dependencies = [
 ]
 
 [[package]]
+name = "slect"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "orfile-macro",
+ "orfile-util",
+ "serde_json",
+]
+
+[[package]]
+name = "slect-macro"
+version = "0.0.1"
+dependencies = [
+ "proc-macro-error",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.100",
+]
+
+[[package]]
+name = "slect-util"
+version = "0.0.1"
+dependencies = [
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tokio",
+]
+
+[[package]]
 name = "smallvec"
 version = "1.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
