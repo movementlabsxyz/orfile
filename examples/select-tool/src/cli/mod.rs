@@ -17,7 +17,8 @@ pub struct Tool {
 
 impl select::Tool {
 	pub async fn execute(&self) -> Result<(), anyhow::Error> {
-		let (maybe_add, maybe_multiply, maybe_divide) = self.select();
+		let (maybe_add, maybe_multiply, maybe_divide) =
+			self.select().map_err(|e| anyhow::anyhow!(e))?;
 
 		if let Some(add) = maybe_add {
 			add.execute().await?;

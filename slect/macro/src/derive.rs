@@ -275,13 +275,13 @@ fn generate_module(
 						let subcommand_args: Vec<_> = self.extra_args.iter()
 							.filter(|arg| arg.starts_with(PREFIX))
 							.cloned()
+							.map(|arg| format!("--{}", arg.replace(PREFIX, "")))
 							.collect();
 
-						if !subcommand_args.is_empty() {
-							<#ty as Parser>::try_parse_from(subcommand_args.iter().map(|s| s.as_str())).ok()
-						} else {
-							None
-						}
+						println!("subcommand_args: {:?}", subcommand_args);
+
+						Some(<#ty as Parser>::try_parse_from(subcommand_args.iter().map(|s| s.as_str())).map_err(|e| format!("Failed to parse subcommand: {}", e))?)
+
 					} else {
 						None
 					}
@@ -365,7 +365,7 @@ fn generate_module(
 				}
 
 				/// Parse the extra_args into selections for each subcommand
-				pub fn select(&self) -> #return_type {
+				pub fn select(&self) -> Result<#return_type, String> {
 					// Show help if requested
 					self.help_all();
 
@@ -374,7 +374,7 @@ fn generate_module(
 						let #selection_types = #prefix_handlers;
 					)*
 
-					#return_value
+					Ok(#return_value)
 				}
 			}
 
