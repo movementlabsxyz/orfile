@@ -18,7 +18,7 @@ pub struct Divide {
 impl Divide {
 	pub async fn execute(&self) -> Result<(), anyhow::Error> {
 		println!("{:?}", self);
-		println!("{}", self.left * self.right);
+		println!("{}", self.left / self.right);
 
 		Ok(())
 	}

@@ -29,6 +29,82 @@ ADD_LEFT=1 tool add using --args-path ./examples/config.json -- --right 4
 
 To see how to implement such a CLI tool using the `orfile::Orfile` macro, see [`tool::cli::add`](./examples/tool/src/cli/add/mod.rs).
 
+## `slect`
+The orfile repo also houses the `slect` API which used for chosing one of many subcommand as Selections. 
+
+**Example**
+Select everything: 
+```
+select-tool --add --multiply --divide -- --add.left 2 --add.right 2 --multiply.left 2 --multiply.right 3 --divide.left 3 --divide.right 2
+Add { left: 2, right: 2 }
+4
+Multiply { left: 2, right: 3 }
+6
+Divide { left: 3, right: 2 }
+1
+```
+
+Select one:
+```
+select-tool --add -- --add.left 2 --add.right 2
+Add { left: 2, right: 2 }
+4
+```
+
+Select multiple but fail to fulfill one:
+```
+select-tool --add --multiply --divide -- --add.left 2 --add.right 2 --multiply.left 2 --multiply.right 3 --divide.left 3
+Error: Failed to parse subcommand: error: the following required arguments were not provided:
+  --right <RIGHT>
+
+Usage: divide --left <LEFT> --right <RIGHT>
+
+For more information, try '--help'.
+```
+
+Get some help with selections:
+```
+select-tool --help-all
+Usage: select-tool [EXTRA_ARGS]...
+
+Arguments:
+  [EXTRA_ARGS]...  
+
+Options:
+  -h, --help  Print help
+
+Selection (1/3): add
+The arguments for the add command
+
+Usage: add{} --left <LEFT> --right <RIGHT>
+
+Options:
+      --left <LEFT>    The left number
+      --right <RIGHT>  The right number
+  -h, --help           Print help (see more with '--help')
+
+Selection (2/3): multiply
+The arguments for the multiply command
+
+Usage: multiply{} --left <LEFT> --right <RIGHT>
+
+Options:
+      --left <LEFT>    The left number
+      --right <RIGHT>  The right number
+  -h, --help           Print help (see more with '--help')
+
+Selection (3/3): divide
+The arguments for the divide command
+
+Usage: divide{} --left <LEFT> --right <RIGHT>
+
+Options:
+      --left <LEFT>    The left number
+      --right <RIGHT>  The right number
+  -h, --help           Print help (see more with '--help')
+```
+
+To see how to implement such a CLI tool using the `slect::Slect` macro, see [`select_tool::clie`](./examples/select-tool/src/cli/mod.rs).
 
 ## Contributing and getting started
 

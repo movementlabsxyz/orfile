@@ -103,108 +103,6 @@ fn generate_struct(struct_name: &Ident, selections: &[SelectionOption]) -> Token
 	}
 }
 
-/// Generate the implementation for the struct
-fn generate_impl(struct_name: &Ident, selections: &[SelectionOption]) -> TokenStream2 {
-	let selection_paths = selections.iter().map(|opt| &opt.subcommand_type).collect::<Vec<_>>();
-	let flag_names = selections.iter().map(|opt| &opt.flag_name).collect::<Vec<_>>();
-
-	// Generate the prefix handling code for each selection
-	let prefix_handlers: Vec<_> = selections
-		.iter()
-		.map(|opt| {
-			let ty = &opt.subcommand_type;
-			let flag = &opt.flag_name;
-			quote! {
-				{
-					if self.#flag {
-						const PREFIX: &str = concat!("--", stringify!(#flag), ".");
-						let subcommand_args: Vec<_> = self.extra_args.iter()
-							.filter(|arg| arg.starts_with(PREFIX))
-							.cloned()
-							.collect();
-
-						if !subcommand_args.is_empty() {
-							<#ty as Parser>::try_parse_from(subcommand_args.iter().map(|s| s.as_str())).ok()
-						} else {
-							None
-						}
-					} else {
-						None
-					}
-				}
-			}
-		})
-		.collect();
-
-	// Generate the help display code for each selection
-	let help_handlers: Vec<_> = selections
-		.iter()
-		.map(|opt| {
-			let ty = &opt.subcommand_type;
-			let flag = &opt.flag_name;
-			quote! {
-				{
-					println!("=== Help for {} ===", <#ty as CommandFactory>::command().get_name());
-					let mut cmd = <#ty as CommandFactory>::command();
-					cmd = cmd.name(concat!(stringify!(#flag), "{}"));
-					cmd.print_help().unwrap();
-					println!();
-				}
-			}
-		})
-		.collect();
-
-	let return_type = if selections.len() == 1 {
-		let ty = &selection_paths[0];
-		quote! { Option<#ty> }
-	} else {
-		let types: Vec<_> = selection_paths.iter().map(|ty| quote! { Option<#ty> }).collect();
-		quote! { (#(#types),*) }
-	};
-
-	let return_value = if selections.len() == 1 {
-		let ty = &selection_paths[0];
-		quote! { #ty }
-	} else {
-		let values: Vec<_> = selection_paths.iter().map(|ty| quote! { #ty }).collect();
-		quote! { (#(#values),*) }
-	};
-
-	quote! {
-		impl #struct_name {
-			/// Shows help for all possible subcommands
-			pub fn help_all(&self) {
-				if self.help_all {
-					use clap::CommandFactory;
-
-					// Show help for the main command
-					let mut cmd = <Self as CommandFactory>::command();
-					cmd.print_help().unwrap();
-					println!();
-
-					// Show help for each subcommand
-					#(#help_handlers)*
-				}
-			}
-
-			/// Parse the extra_args into selections for each subcommand
-			pub fn select(&self) -> #return_type {
-				use clap::Parser;
-
-				// Show help if requested
-				self.help_all();
-
-				// Try parsing each subcommand
-				#(
-					let #selection_paths = #prefix_handlers;
-				)*
-
-				#return_value
-			}
-		}
-	}
-}
-
 /// Implementation of the derive macro
 pub fn impl_slect(input: TokenStream) -> TokenStream {
 	let input = parse_macro_input!(input as DeriveInput);
@@ -271,17 +169,43 @@ fn generate_module(
 			quote! {
 				{
 					if self.#flag {
-						const PREFIX: &str = concat!("--", stringify!(#flag), ".");
-						let subcommand_args: Vec<_> = self.extra_args.iter()
-							.filter(|arg| arg.starts_with(PREFIX))
-							.cloned()
-							.map(|arg| format!("--{}", arg.replace(PREFIX, "")))
-							.collect();
+						const LONG_PREFIX: &str = concat!("--", stringify!(#flag), ".");
+						const SHORT_PREFIX: &str = concat!("-", stringify!(#flag), ".");
+						let mut subcommand_args = Vec::new();
+						let mut args_iter = self.extra_args.iter().peekable();
+						
+						while let Some(arg) = args_iter.next() {
+							if arg.starts_with(LONG_PREFIX) {
+								// Handle prefixed arguments (--flag.value)
+								subcommand_args.push(format!("--{}", arg.replace(LONG_PREFIX, "")));
 
-						println!("subcommand_args: {:?}", subcommand_args);
+								// if the next argument does not strart with -, it is a value for this flag
+								if let Some(next_arg) = args_iter.peek() {
+									if !next_arg.starts_with('-') {
+										subcommand_args.push(args_iter.next().unwrap().clone());
+									}
+								}
 
-						Some(<#ty as Parser>::try_parse_from(subcommand_args.iter().map(|s| s.as_str())).map_err(|e| format!("Failed to parse subcommand: {}", e))?)
+							} else if arg.starts_with(SHORT_PREFIX) {
+								// Handle prefixed arguments (-flag.value)
+								subcommand_args.push(format!("-{}", arg.replace(SHORT_PREFIX, "")));
 
+								// if the next argument does not strart with -, it is a value for this flag
+								if let Some(next_arg) = args_iter.peek() {
+									if !next_arg.starts_with('-') {
+										subcommand_args.push(args_iter.next().unwrap().clone());
+									}
+								}
+							}
+						}
+						
+						// Add the program name as the first argument (required by clap)
+						// this "subcommand" name is just temporary; it doesn't matter what it is
+						let mut args = vec![stringify!(#flag).to_string()];
+						args.extend(subcommand_args);
+						
+						Some(<#ty as Parser>::try_parse_from(args.iter().map(|s| s.as_str())).map_err(|e| format!("Failed to parse subcommand: {}", e))?)
+						
 					} else {
 						None
 					}
