@@ -52,7 +52,7 @@ pub fn impl_slect(input: TokenStream) -> TokenStream {
 						.collect::<Vec<_>>();
 
 					// Generate the module with the struct and implementation
-					let module_def = generate_module(&module_name, &struct_name, &selections);
+					let module_def = generate_module(&module_name, &struct_name, &selections, &input);
 
 					// Return the module definition
 					return TokenStream::from(module_def);
@@ -69,6 +69,7 @@ fn generate_module(
 	module_name: &Ident,
 	struct_name: &Ident,
 	selections: &[SelectionOption],
+	input: &DeriveInput,
 ) -> TokenStream2 {
 	let selection_types = selections.iter().map(|opt| &*opt.subcommand_type).collect::<Vec<_>>();
 	let flag_names = selections.iter().map(|opt| &opt.flag_name).collect::<Vec<_>>();
@@ -137,12 +138,15 @@ fn generate_module(
 			let flag = &opt.flag_name;
 			quote! {
 				{
-					// bold and underscore selection number and flag name
-					println!("\x1b[1;4mSelection ({}/{}):\x1b[0m {}", #index + 1, #selections_len, stringify!(#flag));
+					let mut help = String::new();
+					help.push_str(&format!("\x1b[1;4mSelection ({}/{}):\x1b[0m {}\n", #index + 1, #selections_len, stringify!(#flag)));
 					let mut cmd = <#ty as CommandFactory>::command();
 					cmd = cmd.name(concat!(stringify!(#flag), "{}"));
-					cmd.print_help().unwrap();
-					println!();
+					let mut help_buf = Vec::new();
+					cmd.write_help(&mut help_buf).unwrap();
+					help.push_str(&String::from_utf8_lossy(&help_buf));
+					help.push_str("\n");
+					help
 				}
 			}
 		})
@@ -190,16 +194,29 @@ fn generate_module(
 			}
 
 			impl #struct_name {
+				/// Get help text for all possible subcommands
+				pub fn help_all_string(&self) -> String {
+					let mut help = String::new();
+					
+					// Show help for the main command
+					let mut cmd = <super::#struct_name as CommandFactory>::command();
+					let mut help_buf = Vec::new();
+					cmd.write_help(&mut help_buf).unwrap();
+					help.push_str(&String::from_utf8_lossy(&help_buf));
+					help.push_str("\n");
+
+					// Show help for each subcommand
+					#(
+						help.push_str(&#help_handlers);
+					)*
+
+					help
+				}
+
 				/// Shows help for all possible subcommands
 				pub fn help_all(&self) {
 					if self.help_all {
-						// Show help for the main command
-						let mut cmd = <super::#struct_name as CommandFactory>::command();
-						cmd.print_help().unwrap();
-						println!();
-
-						// Show help for each subcommand
-						#(#help_handlers)*
+						print!("{}", self.help_all_string());
 					}
 				}
 
@@ -217,7 +234,11 @@ fn generate_module(
 				}
 			}
 
-			impl SlectOperations for #struct_name {}
+			impl SlectOperations for #struct_name {
+				fn select_help_all_string(&self) -> String {
+					self.help_all_string()
+				}
+			}
 		}
 	}
 }
