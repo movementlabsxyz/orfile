@@ -78,14 +78,19 @@ For more information, try '--help'.
 
 Get some help with selections:
 ```
-select-tool --help-all
-Usage: select-tool [EXTRA_ARGS]...
+select-tool --help
+A wrapper struct that adds selection flags to the original struct
+
+Usage: select-tool [OPTIONS] [-- <EXTRA_ARGS>...]
 
 Arguments:
-  [EXTRA_ARGS]...  
+  [EXTRA_ARGS]...  Extra arguments to be passed to subcommands
 
 Options:
-  -h, --help  Print help
+      --add       Enable the #flag_names subcommand
+      --multiply  Enable the #flag_names subcommand
+      --divide    Enable the #flag_names subcommand
+  -h, --help      Print help
 
 Selection (1/3): add
 The arguments for the add command
