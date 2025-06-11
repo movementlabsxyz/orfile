@@ -123,6 +123,13 @@ Options:
   -h, --help           Print help (see more with '--help')
 ```
 
+With extended prefixes:
+```
+select-tool --kebab-divide -- --kebab-divide.left 2 --kebab-divide.right 2
+KebabDivide { left: 2, right: 2 }
+1
+```
+
 ## Contributing and getting started
 
 | Task | Description |

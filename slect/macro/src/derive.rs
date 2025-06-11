@@ -6,6 +6,7 @@ use syn::{ parse_macro_input, punctuated::Punctuated, token::Comma,
 	Data, DeriveInput, Expr, ExprPath, Fields, MetaNameValue,
 	Path,
 };
+use heck::ToKebabCase;
 
 /// A selection option parsed from the attribute
 struct SelectionOption {
@@ -79,11 +80,12 @@ fn generate_module(
 		.map(|opt| {
 			let ty = &opt.subcommand_type;
 			let flag = &opt.flag_name;
+			let kebab_flag = flag.to_string().to_kebab_case();
 			quote! {
 				{
 					if self.#flag {
-						const LONG_PREFIX: &str = concat!("--", stringify!(#flag), ".");
-						const SHORT_PREFIX: &str = concat!("-", stringify!(#flag), ".");
+						const LONG_PREFIX: &str = concat!("--", #kebab_flag, ".");
+						const SHORT_PREFIX: &str = concat!("-", #kebab_flag, ".");
 						let mut subcommand_args = Vec::new();
 						let mut args_iter = self.extra_args.iter().peekable();
 						
@@ -114,7 +116,7 @@ fn generate_module(
 						
 						// Add the program name as the first argument (required by clap)
 						// this "subcommand" name is just temporary; it doesn't matter what it is
-						let mut args = vec![stringify!(#flag).to_string()];
+						let mut args = vec![#kebab_flag.to_string()];
 						args.extend(subcommand_args);
 						
 						Some(<#ty as Parser>::try_parse_from(args.iter().map(|s| s.as_str())).map_err(|e| format!("Failed to parse subcommand: {}", e))?)
