@@ -140,7 +140,7 @@ fn generate_module(
 			let kebab_flag = flag.to_string().to_kebab_case();
 			quote! {
 				{
-					let is_markdown = std::env::var("SELECT_TOOL_MARKDOWN").is_ok();
+					let is_markdown = std::env::var("SLECT_TOOL_MARKDOWN").is_ok();
 					let mut help = String::new();
 					if is_markdown {
 						help.push_str(&format!("**Selection ({}/{}):** `{}`\n", #index + 1, #selections_len, #kebab_flag));
