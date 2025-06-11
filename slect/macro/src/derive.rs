@@ -137,12 +137,18 @@ fn generate_module(
 		.map(|(index, opt)| {
 			let ty = &opt.subcommand_type;
 			let flag = &opt.flag_name;
+			let kebab_flag = flag.to_string().to_kebab_case();
 			quote! {
 				{
+					let is_markdown = std::env::var("SELECT_TOOL_MARKDOWN").is_ok();
 					let mut help = String::new();
-					help.push_str(&format!("\x1b[1;4mSelection ({}/{}):\x1b[0m {}\n", #index + 1, #selections_len, stringify!(#flag)));
+					if is_markdown {
+						help.push_str(&format!("**Selection ({}/{}):** `{}`\n", #index + 1, #selections_len, #kebab_flag));
+					} else {
+						help.push_str(&format!("\x1b[1;4mSelection ({}/{}):\x1b[0m {}\n", #index + 1, #selections_len, #kebab_flag));
+					}
 					let mut cmd = <#ty as CommandFactory>::command();
-					cmd = cmd.name(concat!(stringify!(#flag), "{}"));
+					cmd = cmd.name(concat!("--", #kebab_flag, ".*"));
 					let mut help_buf = Vec::new();
 					cmd.write_help(&mut help_buf).unwrap();
 					help.push_str(&String::from_utf8_lossy(&help_buf));
@@ -174,7 +180,7 @@ fn generate_module(
 				#struct_name::help_selection_string()
 			}))]
 			pub struct #struct_name {
-				/// Extra arguments to be passed to subcommands
+				/// Extra arguments to be passed to selections
 				#[arg(last = true)]
 				pub extra_args: Vec<String>,
 
