@@ -78,7 +78,7 @@ For more information, try '--help'.
 
 Get some help with selections:
 ```
-select-tool --help
+select-tool --help           
 A wrapper struct that adds selection flags to the original struct
 
 Usage: select-tool [OPTIONS] [-- <EXTRA_ARGS>...]
@@ -87,12 +87,13 @@ Arguments:
   [EXTRA_ARGS]...  Extra arguments to be passed to subcommands
 
 Options:
-      --add       Enable the #flag_names subcommand
-      --multiply  Enable the #flag_names subcommand
-      --divide    Enable the #flag_names subcommand
-  -h, --help      Print help
+      --add           Enable the add selection
+      --multiply      Enable the multiply selection
+      --divide        Enable the divide selection
+      --kebab-divide  Enable the kebab-divide selection
+  -h, --help          Print help
 
-Selection (1/3): add
+Selection (1/4): add
 The arguments for the add command
 
 Usage: add{} --left <LEFT> --right <RIGHT>
@@ -102,7 +103,7 @@ Options:
       --right <RIGHT>  The right number
   -h, --help           Print help (see more with '--help')
 
-Selection (2/3): multiply
+Selection (2/4): multiply
 The arguments for the multiply command
 
 Usage: multiply{} --left <LEFT> --right <RIGHT>
@@ -112,10 +113,20 @@ Options:
       --right <RIGHT>  The right number
   -h, --help           Print help (see more with '--help')
 
-Selection (3/3): divide
+Selection (3/4): divide
 The arguments for the divide command
 
 Usage: divide{} --left <LEFT> --right <RIGHT>
+
+Options:
+      --left <LEFT>    The left number
+      --right <RIGHT>  The right number
+  -h, --help           Print help (see more with '--help')
+
+Selection (4/4): kebab_divide
+The arguments for the kebabdivide command
+
+Usage: kebab_divide{} --left <LEFT> --right <RIGHT>
 
 Options:
       --left <LEFT>    The left number

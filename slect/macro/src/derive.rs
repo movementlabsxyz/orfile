@@ -72,6 +72,7 @@ fn generate_module(
 ) -> TokenStream2 {
 	let selection_types = selections.iter().map(|opt| &*opt.subcommand_type).collect::<Vec<_>>();
 	let flag_names = selections.iter().map(|opt| &opt.flag_name).collect::<Vec<_>>();
+	let kebab_flags: Vec<String> = flag_names.iter().map(|f| f.to_string().to_kebab_case()).collect();
 	let selections_len = selections.len();
 
 	// Generate the prefix handling code for each selection
@@ -178,8 +179,7 @@ fn generate_module(
 				pub extra_args: Vec<String>,
 
 				#(
-					/// Enable the #flag_names subcommand
-					#[arg(long)]
+					#[arg(long, help = concat!("Enable the ", #kebab_flags, " selection"))]
 					pub #flag_names: bool,
 				)*
 			}
