@@ -1,12 +1,10 @@
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, TokenStream as TokenStream2};
 use proc_macro_error::{abort, abort_call_site};
-use quote::{format_ident, quote, ToTokens};
-use syn::spanned::Spanned;
-use syn::{
-	parse::Parse, parse::ParseStream, parse_macro_input, punctuated::Punctuated, token::Comma,
-	Data, DeriveInput, Expr, ExprLit, ExprPath, FieldMutability, Fields, Lit, Meta, MetaNameValue,
-	Path, Result as SynResult, Token,
+use quote::quote;
+use syn::{ parse_macro_input, punctuated::Punctuated, token::Comma,
+	Data, DeriveInput, Expr, ExprPath, Fields, MetaNameValue,
+	Path,
 };
 
 /// A selection option parsed from the attribute
@@ -158,14 +156,6 @@ fn generate_module(
 	} else {
 		let types: Vec<_> = selection_types.iter().map(|ty| quote! { Option<#ty> }).collect();
 		quote! { (#(#types),*) }
-	};
-
-	let return_value = if selections.len() == 1 {
-		let ty = &selection_types[0];
-		quote! { #ty }
-	} else {
-		let values: Vec<_> = selection_types.iter().map(|ty| quote! { #ty }).collect();
-		quote! { (#(#values),*) }
 	};
 
 	quote! {
