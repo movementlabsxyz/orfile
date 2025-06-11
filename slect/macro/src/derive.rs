@@ -163,18 +163,17 @@ fn generate_module(
 			use super::*;
 			use clap::{Parser, CommandFactory};
 			use slect::SlectOperations;
+			use slect::LazyString;
 
 			/// A wrapper struct that adds selection flags to the original struct
 			#[derive(Debug, Parser)]
-			#[command(name = "select-tool")]
+			#[command(after_help = LazyString::new(|| {
+				#struct_name::help_selection_string()
+			}))]
 			pub struct #struct_name {
 				/// Extra arguments to be passed to subcommands
 				#[arg(last = true)]
 				pub extra_args: Vec<String>,
-
-				/// Show help for all possible subcommands
-				#[arg(long)]
-				pub help_all: bool,
 
 				#(
 					/// Enable the #flag_names subcommand
@@ -185,15 +184,8 @@ fn generate_module(
 
 			impl #struct_name {
 				/// Get help text for all possible subcommands
-				pub fn help_all_string(&self) -> String {
+				pub fn help_selection_string() -> String {
 					let mut help = String::new();
-					
-					// Show help for the main command
-					let mut cmd = <super::#struct_name as CommandFactory>::command();
-					let mut help_buf = Vec::new();
-					cmd.write_help(&mut help_buf).unwrap();
-					help.push_str(&String::from_utf8_lossy(&help_buf));
-					help.push_str("\n");
 
 					// Show help for each subcommand
 					#(
@@ -203,17 +195,8 @@ fn generate_module(
 					help
 				}
 
-				/// Shows help for all possible subcommands
-				pub fn help_all(&self) {
-					if self.help_all {
-						print!("{}", self.help_all_string());
-					}
-				}
-
 				/// Parse the extra_args into selections for each subcommand
 				pub fn select(&self) -> Result<#return_type, String> {
-					// Show help if requested
-					self.help_all();
 
 					// Try parsing each subcommand
 					#(
@@ -225,8 +208,8 @@ fn generate_module(
 			}
 
 			impl SlectOperations for #struct_name {
-				fn select_help_all_string(&self) -> String {
-					self.help_all_string()
+				fn select_help_selection_string() -> String {
+					Self::help_selection_string()
 				}
 			}
 		}

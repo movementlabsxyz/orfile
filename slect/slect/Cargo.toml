@@ -14,6 +14,7 @@ slect-macro = { workspace = true}
 slect-util = { workspace = true}
 anyhow = { workspace = true }
 serde_json = { workspace = true }
+once_cell = { workspace = true }
 
 [lints]
 workspace = true

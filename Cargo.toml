@@ -52,6 +52,7 @@ proc-macro2 = "1.0.32"
 proc-macro-error = { version = "1.0.4", features = ["syn-error"] }
 strip-ansi-escapes = "0.2.1"
 cargo_metadata = "0.19.2"
+once_cell = "1.21.3"
 
 # internal
 ## orfile
