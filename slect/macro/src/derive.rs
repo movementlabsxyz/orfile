@@ -69,7 +69,7 @@ fn generate_module(
 	module_name: &Ident,
 	struct_name: &Ident,
 	selections: &[SelectionOption],
-	input: &DeriveInput,
+	_input: &DeriveInput,
 ) -> TokenStream2 {
 	let selection_types = selections.iter().map(|opt| &*opt.subcommand_type).collect::<Vec<_>>();
 	let flag_names = selections.iter().map(|opt| &opt.flag_name).collect::<Vec<_>>();
@@ -227,10 +227,10 @@ fn generate_module(
 
 					// Try parsing each subcommand
 					#(
-						let #selection_types = #prefix_handlers;
+						let #flag_names: Option<#selection_types> = #prefix_handlers;
 					)*
 
-					Ok(#return_value)
+					Ok((#(#flag_names),*))
 				}
 			}
 
