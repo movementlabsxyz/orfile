@@ -17,84 +17,6 @@ struct SelectionOption {
 	subcommand_type: Box<Path>,
 }
 
-/// Get the last segment of a path as an identifier
-fn get_path_ident(path: &Path) -> syn::Result<Ident> {
-	Ok(path
-		.segments
-		.last()
-		.ok_or_else(|| syn::Error::new_spanned(path, "Expected a non-empty path"))?
-		.ident
-		.clone())
-}
-
-/// Parse a selection option from the attribute
-fn parse_selection_option(expr: &Expr) -> syn::Result<SelectionOption> {
-	match expr {
-		Expr::Tuple(tuple) => {
-			if tuple.elems.len() != 2 {
-				return Err(syn::Error::new_spanned(expr, "Expected (prefix, subcommand) tuple"));
-			}
-
-			let prefix = match &tuple.elems[0] {
-				Expr::Lit(ExprLit { lit: Lit::Str(s), .. }) => Some(s.value()),
-				_ => {
-					return Err(syn::Error::new_spanned(
-						&tuple.elems[0],
-						"Expected string literal for prefix",
-					))
-				}
-			};
-
-			let subcommand_path = match &tuple.elems[1] {
-				Expr::Path(p) => p.path.clone(),
-				_ => {
-					return Err(syn::Error::new_spanned(
-						&tuple.elems[1],
-						"Expected path for subcommand",
-					))
-				}
-			};
-
-			Ok(SelectionOption {
-				flag_name: get_path_ident(&subcommand_path)?,
-				subcommand_type: Box::new(subcommand_path),
-			})
-		}
-		Expr::Path(p) => Ok(SelectionOption {
-			flag_name: get_path_ident(&p.path)?,
-			subcommand_type: Box::new(p.path.clone()),
-		}),
-		_ => Err(syn::Error::new_spanned(expr, "Expected path or tuple")),
-	}
-}
-
-/// Generate the struct definition with the extra_args field
-fn generate_struct(struct_name: &Ident, selections: &[SelectionOption]) -> TokenStream2 {
-	let selection_paths = selections.iter().map(|opt| &opt.subcommand_type).collect::<Vec<_>>();
-	let doc_comment = format!("The slect subcommand implementation for {}", struct_name);
-
-	quote! {
-		#[derive(Debug, Parser)]
-		#[command(name = "select-tool")]
-		#[doc = #doc_comment]
-		pub struct #struct_name {
-			/// Extra arguments to be passed to subcommands
-			#[arg(last = true)]
-			pub extra_args: Vec<String>,
-
-			/// Show help for all possible subcommands
-			#[arg(long)]
-			pub help_all: bool,
-
-			#(
-				/// Enable the #selection_paths subcommand
-				#[arg(long)]
-				pub #selection_paths: bool,
-			)*
-		}
-	}
-}
-
 /// Implementation of the derive macro
 pub fn impl_slect(input: TokenStream) -> TokenStream {
 	let input = parse_macro_input!(input as DeriveInput);
@@ -292,19 +214,6 @@ fn generate_module(
 					)*
 
 					Ok(#return_value)
-				}
-			}
-
-			impl super::#struct_name {
-				/// Create a new selector for this struct
-				pub fn selector(&self) -> #struct_name {
-					#struct_name {
-						extra_args: self.extra_args.clone(),
-						help_all: false,
-						#(
-							#flag_names: false,
-						)*
-					}
 				}
 			}
 
