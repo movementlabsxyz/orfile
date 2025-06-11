@@ -71,20 +71,12 @@ fn parse_selection_option(expr: &Expr) -> syn::Result<SelectionOption> {
 /// Generate the struct definition with the extra_args field
 fn generate_struct(struct_name: &Ident, selections: &[SelectionOption]) -> TokenStream2 {
 	let selection_paths = selections.iter().map(|opt| &opt.subcommand_type).collect::<Vec<_>>();
+	let doc_comment = format!("The slect subcommand implementation for {}", struct_name);
 
 	quote! {
 		#[derive(Debug, Parser)]
 		#[command(name = "select-tool")]
-		/// A tool for selecting and running subcommands with optional prefixes.
-		///
-		/// Extra arguments can be passed to the subcommands. These can be prefixed with
-		/// the subcommand's prefix (e.g., --add.arg1, --multiply.arg2) or unprefixed.
-		///
-		/// Available flags:
-		/// --help-all: Show help for all possible subcommands
-		/// --add: Enable the add subcommand
-		/// --multiply: Enable the multiply subcommand
-		/// --divide: Enable the divide subcommand
+		#[doc = #doc_comment]
 		pub struct #struct_name {
 			/// Extra arguments to be passed to subcommands
 			#[arg(last = true)]
@@ -254,6 +246,7 @@ fn generate_module(
 		pub mod #module_name {
 			use super::*;
 			use clap::{Parser, CommandFactory};
+			use slect::SlectOperations;
 
 			/// A wrapper struct that adds selection flags to the original struct
 			#[derive(Debug, Parser)]
@@ -314,6 +307,8 @@ fn generate_module(
 					}
 				}
 			}
+
+			impl SlectOperations for #struct_name {}
 		}
 	}
 }
