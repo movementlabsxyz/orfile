@@ -17,16 +17,16 @@ struct SelectionOption {
 }
 
 /// Implementation of the derive macro
-pub fn impl_slect(input: TokenStream) -> TokenStream {
+pub fn impl_select(input: TokenStream) -> TokenStream {
 	let input = parse_macro_input!(input as DeriveInput);
 	let struct_name = input.ident.clone();
-	let module_name = quote::format_ident!("select");
+	let module_name = quote::format_ident!("select_command");
 
-	// Find the field with the #[slect] attribute
+	// Find the field with the #[select] attribute
 	if let Data::Struct(data) = &input.data {
 		if let Fields::Named(fields) = &data.fields {
 			for field in &fields.named {
-				if let Some(attr) = field.attrs.iter().find(|attr| attr.path().is_ident("slect")) {
+				if let Some(attr) = field.attrs.iter().find(|attr| attr.path().is_ident("select")) {
 					let meta = attr
 						.meta
 						.require_list()
@@ -60,7 +60,7 @@ pub fn impl_slect(input: TokenStream) -> TokenStream {
 		}
 	}
 
-	abort_call_site!("Expected a struct with a field marked with #[slect] attribute")
+	abort_call_site!("Expected a struct with a field marked with #[select] attribute")
 }
 
 /// Generate a module containing the struct and implementation
@@ -171,8 +171,8 @@ fn generate_module(
 		pub mod #module_name {
 			use super::*;
 			use clap::{Parser, CommandFactory};
-			use slect::SlectOperations;
-			use slect::LazyString;
+			use select::SelectOperations;
+			use select::LazyString;
 
 			/// A wrapper struct that adds selection flags to the original struct
 			#[derive(Debug, Parser)]
@@ -215,7 +215,7 @@ fn generate_module(
 				}
 			}
 
-			impl SlectOperations for #struct_name {
+			impl SelectOperations for #struct_name {
 				fn select_help_selection_string() -> String {
 					Self::help_selection_string()
 				}

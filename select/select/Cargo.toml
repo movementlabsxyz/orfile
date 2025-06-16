@@ -1,5 +1,5 @@
 [package]
-name = "slect"
+name = "select"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -10,8 +10,8 @@ publish.workspace = true
 rust-version.workspace = true
 
 [dependencies]
-slect-macro = { workspace = true}
-slect-util = { workspace = true}
+select-macro = { workspace = true}
+select-util = { workspace = true}
 anyhow = { workspace = true }
 serde_json = { workspace = true }
 once_cell = { workspace = true }

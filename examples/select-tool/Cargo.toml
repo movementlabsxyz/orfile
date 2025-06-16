@@ -16,7 +16,7 @@ clap = { workspace = true}
 dotenv = { workspace = true }
 anyhow = { workspace = true }
 orfile = { workspace = true }
-slect = { workspace = true }
+select = { workspace = true }
 
 [lints]
 workspace = true

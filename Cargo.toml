@@ -5,7 +5,7 @@ resolver = "2"
 members = [
 
   "orfile/*",
-  "slect/*", 
+  "select/*", 
   "examples/*",
 
 ]
@@ -60,10 +60,10 @@ heck = "0.4.1"
 orfile = { path = "orfile/orfile" }
 orfile-util = { path = "orfile/util" }
 orfile-macro = { path = "orfile/macro" }
-## slect
-slect = { path = "slect/slect" }
-slect-util = { path = "slect/util" }
-slect-macro = { path = "slect/macro" }
+## select
+select = { path = "select/select" }
+select-util = { path = "select/util" }
+select-macro = { path = "select/macro" }
 
 
 [workspace.lints.clippy]

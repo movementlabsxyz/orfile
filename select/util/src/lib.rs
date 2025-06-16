@@ -1,8 +1,8 @@
 use clap::builder::{IntoResettable, Resettable, StyledStr};
 use once_cell::sync::Lazy;
 
-/// A marker trait for slect operations.
-pub trait SlectOperations {
+/// A marker trait for select operations.
+pub trait SelectOperations {
 	/// Gets the help_selection_string text.
 	///
 	/// Note: this is useful for higher order compositions of Select commands.
