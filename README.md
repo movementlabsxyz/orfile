@@ -30,20 +30,20 @@ tool add where --left 1 --right 2
 ADD_LEFT=1 tool add using --args-path ./examples/config.json -- --right 4
 ```
 
-## `slect`
-The `orfile` repo also houses the `slect` API which used for chosing one of many subcommand as Selections. 
+## `select`
+The `orfile` repo also houses the `select` API which used for chosing one of many subcommand as Selections. 
 
 > [!WARNING]
 > The task of prefixing flattend args in [`clap`](https://github.com/clap-rs/clap) has long been unresolved, owing to abstractions on the parser and their availability in different contexts.
 > 
-> `slect` works around these limitations at the expense of direct `--help` support--essentially extending the parsing into `extra_args` with prefix handling.  
+> `select` works around these limitations at the expense of direct `--help` support--essentially extending the parsing into `extra_args` with prefix handling.  
 >
 > **See, for more information about complications associated with `clap` prefixing:**
 > - https://github.com/clap-rs/clap/issues/3117
 > - https://github.com/clap-rs/clap/issues/5374
 
 > [!TIP]
-> To see how to implement such a CLI tool using the `slect::Slect` macro, see [`select_tool::cli`](./examples/select-tool/src/cli/mod.rs).
+> To see how to implement such a CLI tool using the `select::Select` macro, see [`select_tool::cli`](./examples/select-tool/src/cli/mod.rs).
 
 **Example**
 
